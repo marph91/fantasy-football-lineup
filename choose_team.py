@@ -119,7 +119,7 @@ def print_results(model):
         "Name",
         "Ingame value [Mio. €]",
         "Market value [Mio. €]",
-        "Ratio (ingame / market)",
+        "Ratio (market / ingame)",
     ]
     for player in sorted(team):
         table.add_row(player)
