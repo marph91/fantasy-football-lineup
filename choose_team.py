@@ -40,12 +40,12 @@ def create_model(dataframe):
     )
 
     # Is the player chosen for the final team?
-    model.Chosen = pyomo_env.Var(model.name_, within=pyomo_env.Boolean, initialize=1)
+    model.chosen = pyomo_env.Var(model.name_, within=pyomo_env.Boolean, initialize=1)
 
     # Objective: Maximize the market value of the players.
     def market_value_rule(model):
         market_value_sum = sum(
-            model.market_value[i] * model.Chosen[i] for i in model.name_
+            model.market_value[i] * model.chosen[i] for i in model.name_
         )
         return market_value_sum
 
@@ -55,7 +55,7 @@ def create_model(dataframe):
 
     # Constraint: Ingame cost of the players.
     def cost_rule(model):
-        value = sum(model.cost_ingame[i] * model.Chosen[i] for i in model.name_)
+        value = sum(model.cost_ingame[i] * model.chosen[i] for i in model.name_)
         return value <= maximum_ingame_value
 
     model.total_cost = pyomo_env.Constraint(rule=cost_rule)
@@ -63,7 +63,7 @@ def create_model(dataframe):
     # Constraint: Amount of players for each position.
     def position_rule(model, position, expected_count):
         actual_count = sum(
-            model.Chosen[i] * (model.position[i] == position.value) for i in model.name_
+            model.chosen[i] * (model.position[i] == position.value) for i in model.name_
         )
         return actual_count == expected_count
 
@@ -73,7 +73,7 @@ def create_model(dataframe):
 
     # Constraint: Maximum team size.
     def total_players_rule(model):
-        value = sum(model.Chosen[i] for i in model.name_)
+        value = sum(model.chosen[i] for i in model.name_)
         return value == total_players
 
     model.total_players = pyomo_env.Constraint(rule=total_players_rule)
@@ -81,7 +81,7 @@ def create_model(dataframe):
     # Constraint: Amount of players of each national team.
     def nationality_rule(model, nation, count_min, count_max):
         actual_count = sum(
-            model.Chosen[i] * (model.nationality[i] == nation) for i in model.name_
+            model.chosen[i] * (model.nationality[i] == nation) for i in model.name_
         )
         return pyomo_env.inequality(count_min, actual_count, count_max)
 
@@ -100,7 +100,7 @@ def print_results(model):
     total_market_value = 0
     team = []
     for i in model.name_:
-        if bool(pyomo_env.value(model.Chosen[i])):
+        if bool(pyomo_env.value(model.chosen[i])):
             team.append(
                 (
                     Position(model.position[i]),
