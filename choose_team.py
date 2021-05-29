@@ -7,13 +7,18 @@ from common import Position
 
 
 def create_model(dataframe):
+    # Configuration
     expected_position_counts = {
         Position.GOALKEEPER: 2,
         Position.DEFENSE: 5,
         Position.MIDFIELD: 5,
         Position.OFFENSE: 3,
     }
+    total_players = 15
+    players_per_nation = (0, 3)  # minimum 0, maximum 3
+    maximum_ingame_value = 100 * 10 ** 6  # 100 million
 
+    # Define the actual model.
     model = pyomo_env.ConcreteModel()
 
     model.name_ = pyomo_env.Set(initialize=dataframe.name_.to_list())
@@ -47,7 +52,7 @@ def create_model(dataframe):
     # Constrain the cost of the players.
     def cost_rule(model):
         value = sum(model.cost_ingame[i] * model.Chosen[i] for i in model.name_)
-        return value <= 100 * 10 ** 6  # Maximum 10 Mio.
+        return value <= maximum_ingame_value
 
     model.total_cost = pyomo_env.Constraint(rule=cost_rule)
 
@@ -65,7 +70,7 @@ def create_model(dataframe):
     # Team has to be exactly 15 players in total.
     def total_players_rule(model):
         value = sum(model.Chosen[i] for i in model.name_)
-        return value == sum(expected_position_counts.values())
+        return value == total_players
 
     model.total_players = pyomo_env.Constraint(rule=total_players_rule)
 
