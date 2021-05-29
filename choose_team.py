@@ -7,6 +7,13 @@ from common import Position
 
 
 def create_model(dataframe):
+    expected_position_counts = {
+        Position.GOALKEEPER: 2,
+        Position.DEFENSE: 5,
+        Position.MIDFIELD: 5,
+        Position.OFFENSE: 3,
+    }
+
     model = pyomo_env.ConcreteModel()
 
     model.name_ = pyomo_env.Set(initialize=dataframe.name_.to_list())
@@ -42,51 +49,25 @@ def create_model(dataframe):
         value = sum(model.cost_ingame[i] * model.Chosen[i] for i in model.name_)
         return value <= 100 * 10 ** 6  # Maximum 10 Mio.
 
-    model.total_cost = pyomo_env.Constraint(model.name_, rule=cost_rule)
+    model.total_cost = pyomo_env.Constraint(rule=cost_rule)
 
     # Constrain the amount of players for each position.
-    def goalkeeper_rule(model):
-        value = sum(
-            model.Chosen[i] * (model.position[i] == Position.GOALKEEPER.value)
-            for i in model.name_
+    def position_rule(model, position, expected_count):
+        actual_count = sum(
+            model.Chosen[i] * (model.position[i] == position.value) for i in model.name_
         )
-        return pyomo_env.inequality(2, value, 2)
+        return actual_count == expected_count
 
-    model.goalkeeper = pyomo_env.Constraint(model.name_, rule=goalkeeper_rule)
-
-    def defense_rule(model):
-        value = sum(
-            model.Chosen[i] * (model.position[i] == Position.DEFENSE.value)
-            for i in model.name_
-        )
-        return pyomo_env.inequality(5, value, 5)
-
-    model.defense = pyomo_env.Constraint(model.name_, rule=defense_rule)
-
-    def midfield_rule(model):
-        value = sum(
-            model.Chosen[i] * (model.position[i] == Position.MIDFIELD.value)
-            for i in model.name_
-        )
-        return pyomo_env.inequality(5, value, 5)
-
-    model.midfield = pyomo_env.Constraint(model.name_, rule=midfield_rule)
-
-    def offense_rule(model):
-        value = sum(
-            model.Chosen[i] * int(model.position[i] == Position.OFFENSE.value)
-            for i in model.name_
-        )
-        return pyomo_env.inequality(3, value, 3)
-
-    model.offense = pyomo_env.Constraint(model.name_, rule=offense_rule)
+    model.positions = pyomo_env.Constraint(
+        expected_position_counts.items(), rule=position_rule
+    )
 
     # Team has to be exactly 15 players in total.
     def total_players_rule(model):
         value = sum(model.Chosen[i] for i in model.name_)
-        return value == 15
+        return value == sum(expected_position_counts.values())
 
-    model.total_players = pyomo_env.Constraint(model.name_, rule=total_players_rule)
+    model.total_players = pyomo_env.Constraint(rule=total_players_rule)
 
     return model
 
