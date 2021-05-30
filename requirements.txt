@@ -1,0 +1,6 @@
+beautifulsoup4==4.9.3
+pandas==1.2.4
+prettytable==2.1.0
+Pyomo==6.0
+requests==2.25.1
+selenium==3.141.0

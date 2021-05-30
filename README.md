@@ -5,6 +5,7 @@ fantasy-football-lineup is a tool to find the optimal lineup for the [EURO 2020 
 ## Usage example
 
 ```bash
+> pip install -r requirements.txt
 > python obtain_data.py
 > python choose_team.py
 +---------------------+------------------------+-----------------------+-----------------------+-------------------------+
