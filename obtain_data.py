@@ -210,7 +210,9 @@ def merge_player_data(available_players, player_data_transfermarkt):
             if p.family_name() == player.family_name():
                 logging.debug("Found in normal lookup.")
                 possible_matches.append(p)
-            elif p.family_name(special_chars=False) == player.family_name(special_chars=False):
+            elif p.family_name(special_chars=False) == player.family_name(
+                special_chars=False
+            ):
                 logging.debug("Found in lookup with special chars replaced.")
                 possible_matches.append(p)
             elif special_mappings.get(player.name, "") == p.name:
@@ -237,8 +239,8 @@ def merge_player_data(available_players, player_data_transfermarkt):
 
     logging.info(f"Complete_players: {len(complete_players)}")
     logging.info(
-        f"Missing players: {len(missing_players)}: {[p.name for p in missing_players]}\n" +
-        "The reason might be duplicated name, injury or dismissal."
+        f"Missing players: {len(missing_players)}: {[p.name for p in missing_players]}\n"
+        + "The reason might be duplicated name, injury or dismissal."
     )
     return complete_players
 
@@ -296,7 +298,9 @@ def main():
         help="Show players with the baes ratio (market value / ingame value).",
     )
     parser.add_argument(
-        "--exclude-list", default=None, help="List of players to exclude. Separated by new line.",
+        "--exclude-list",
+        default=None,
+        help="List of players to exclude. Separated by new line.",
     )
     args = parser.parse_args()
 
@@ -315,11 +319,7 @@ def main():
     if args.show_top_ratios:
         print_top_ratios(data)  # Only for information.
 
-    filename = "work/test.csv"
-    if not os.path.isfile(filename) or args.force:
-        data_to_csv(data, filename)
-    else:
-        logging.info(f"Use cached data from {filename}.")
+    data_to_csv(data, "work/test.csv")
 
 
 if __name__ == "__main__":
