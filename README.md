@@ -30,6 +30,8 @@ fantasy-football-lineup is a tool to find the optimal lineup for the [EURO 2020 
 +---------------------+------------------------+-----------------------+-----------------------+-------------------------+
 ```
 
+For extended usage, check the help of `obtain_data.py`. There are some useful flags for printing the players with the highest market to ingame value ratio, excluding players and refreshing the cache.
+
 ## Detailed workflow
 
 | Step | Modules |
@@ -50,6 +52,8 @@ Consider more metrics than just the market value. The players with highest marke
 - Bonus for penalty shooters
 
 The metrics should be obtainable without many requests. Preferably team wise or even in a single database.
+
+A known issue is that the script can't resolve duplicated names. Duplicated means the first letter of the first name and family name are identical. This could be fixed only with an ID system.
 
 ## Further links
 
