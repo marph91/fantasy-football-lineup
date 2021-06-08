@@ -30,6 +30,8 @@ fantasy-football-lineup is a tool to find the optimal lineup for the [EURO 2020 
 +---------------------+------------------------+-----------------------+-----------------------+-------------------------+
 ```
 
+This example team is not based on the latest data. To get the best team, you should try yourself ;)
+
 For extended usage, check the help of `obtain_data.py`. There are some useful flags for printing the players with the highest market to ingame value ratio, excluding players and refreshing the cache.
 
 ## Detailed workflow
