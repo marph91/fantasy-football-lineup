@@ -290,6 +290,9 @@ def main():
         action="store_true",
         help="Show players with the baes ratio (market value / ingame value).",
     )
+    parser.add_argument(
+        "--exclude-list", default=None, help="List of players to exclude. Separated by new line.",
+    )
     args = parser.parse_args()
 
     available_players = get_data(
@@ -300,6 +303,10 @@ def main():
     )
 
     data = merge_player_data(available_players, player_data_transfermarkt)
+    if args.exclude_list is not None:
+        with open(args.exclude_list) as infile:
+            exclude_list = infile.read()
+        data = [d for d in data if d.name not in exclude_list]
     if args.show_top_ratios:
         print_top_ratios(data)  # Only for information.
 
