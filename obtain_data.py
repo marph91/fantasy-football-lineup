@@ -190,6 +190,16 @@ def match_first_letter(current_player, match_options):
 
 def merge_player_data(available_players, player_data_transfermarkt):
     """Try to find stats for each available player by matching names."""
+    # Special cases, because of different naming.
+    special_mappings = {
+        "A. Zabolotny": "Anton Zabolotnyi",
+        "Danilo": "Danilo Pereira",
+        "E. Bardi": "Enis Bardhi",
+        "M. Kerem Aktürkoglu": "Kerem Aktürkoglu",
+        "N. Nikolić": "Nemanja Nikolics",
+        "T. Alcántara": "Thiago",
+    }
+
     complete_players = []
     missing_players = []
     for player in available_players:
@@ -197,18 +207,13 @@ def merge_player_data(available_players, player_data_transfermarkt):
 
         possible_matches = []
         for p in player_data_transfermarkt:
-            if p.family_name().endswith(player.family_name()):
+            if p.family_name() == player.family_name():
                 logging.debug("Found in normal lookup.")
                 possible_matches.append(p)
-            elif p.family_name(special_chars=False).endswith(
-                player.family_name(special_chars=False)
-            ):
+            elif p.family_name(special_chars=False) == player.family_name(special_chars=False):
                 logging.debug("Found in lookup with special chars replaced.")
                 possible_matches.append(p)
-            elif player.family_name() == "alcántara" and p.family_name().endswith(
-                "thiago"
-            ):
-                # Special case, because of different naming.
+            elif special_mappings.get(player.name, "") == p.name:
                 logging.debug("Found in lookup with hardcoded names.")
                 possible_matches.append(p)
 
@@ -232,9 +237,9 @@ def merge_player_data(available_players, player_data_transfermarkt):
 
     logging.info(f"Complete_players: {len(complete_players)}")
     logging.info(
-        f"Missing players: {len(missing_players)}: {[p.name for p in missing_players]}"
+        f"Missing players: {len(missing_players)}: {[p.name for p in missing_players]}\n" +
+        "The reason might be duplicated name, injury or dismissal."
     )
-    logging.debug("Ibrahimovic is missing, because not in swedens lineup.")
     return complete_players
 
 
