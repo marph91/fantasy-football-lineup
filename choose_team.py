@@ -1,3 +1,5 @@
+import argparse
+
 import pandas as pd
 import pyomo.environ as pyomo_env
 from pyomo.opt import SolverFactory
@@ -10,13 +12,13 @@ def create_model(dataframe):
     # Configuration
     expected_position_counts = {
         Position.GOALKEEPER: 2,
-        Position.DEFENSE: 5,
-        Position.MIDFIELD: 5,
-        Position.OFFENSE: 3,
+        Position.DEFENDER: 4,
+        Position.MIDFIELDER: 6,
+        Position.FORWARD: 3,
     }
     total_players = 15
     players_per_nation = (0, 3)  # minimum 0, maximum 3
-    maximum_ingame_value = 100 * 10 ** 6  # 100 million
+    maximum_ingame_value = 30.0 * 10**6  # million
 
     # Define the actual model.
     model = pyomo_env.ConcreteModel()
@@ -63,7 +65,7 @@ def create_model(dataframe):
     # Constraint: Amount of players for each position.
     def position_rule(model, position, expected_count):
         actual_count = sum(
-            model.chosen[i] * (model.position[i] == position.value) for i in model.name_
+            model.chosen[i] * (model.position[i] == position.name) for i in model.name_
         )
         return actual_count == expected_count
 
@@ -103,10 +105,10 @@ def print_results(model):
         if bool(pyomo_env.value(model.chosen[i])):
             team.append(
                 (
-                    Position(model.position[i]),
+                    Position[model.position[i]],
                     i,
                     model.cost_ingame[i] / 1000000.0,
-                    model.market_value[i] / 1000000.0,
+                    model.market_value[i],
                     f"{model.market_value[i] / model.cost_ingame[i]:.2f}",
                 )
             )
@@ -136,7 +138,29 @@ def print_results(model):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--force", action="store_true", help="Force refreshing of the cache."
+    )
+    parser.add_argument(
+        "--show-top-ratios",
+        action="store_true",
+        help="Show players with the baes ratio (market value / ingame value).",
+    )
+    parser.add_argument(
+        "--exclude-list",
+        default=None,
+        help="List of players to exclude. Separated by new line.",
+    )
+    args = parser.parse_args()
+
     dataframe = pd.read_csv("work/test.csv")
+
+    if args.exclude_list is not None:
+        with open(args.exclude_list) as infile:
+            exclude_list = infile.readlines()
+        dataframe = dataframe[~dataframe["name_"].isin(exclude_list)]
+
     model = create_model(dataframe)
 
     opt = SolverFactory("glpk")

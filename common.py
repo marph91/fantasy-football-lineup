@@ -7,15 +7,19 @@ from selenium import webdriver
 import requests
 
 
+# TODO: Check for better datatype: https://stackoverflow.com/q/31537316/7410886
 class Position(enum.Enum):
     GOALKEEPER = 0
-    TW = 0
-    DEFENSE = 1
-    AW = 1
-    MIDFIELD = 2
-    MF = 2
-    OFFENSE = 3
-    ST = 3
+    # TW = 0
+    # DEFENSE = 1
+    DEFENDER = 1
+    # AW = 1
+    # MIDFIELD = 2
+    MIDFIELDER = 2
+    # MF = 2
+    # OFFENSE = 3
+    FORWARD = 3
+    # ST = 3
 
     def __lt__(self, other):
         return self.value < other.value
@@ -116,9 +120,11 @@ def idfy(name: str) -> str:
         "ď": "d",
         "é": "e",
         "ę": "e",
+        "ë": "e",
         "ğ": "g",
         "ı": "i",
         "í": "i",
+        "ï": "i",
         "ł": "l",
         "ń": "n",
         "ň": "n",
@@ -126,6 +132,7 @@ def idfy(name: str) -> str:
         "ö": "oe",
         "ø": "oe",
         "ó": "o",
+        "ô": "o",
         "ß": "ss",
         "š": "s",
         "ş": "s",

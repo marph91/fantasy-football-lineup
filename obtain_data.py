@@ -4,6 +4,7 @@ import os
 import pickle
 
 from bs4 import BeautifulSoup
+import pandas as pd
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.remote_connection import LOGGER as seleniumLogger
@@ -30,18 +31,18 @@ logging.basicConfig(
 def get_data_from_transfermarkt_de(session):
     # Parse all participants and their id.
     page = session.get(
-        "https://www.transfermarkt.de/europameisterschaft-2020/startseite/pokalwettbewerb/EM20"
+        "https://www.transfermarkt.de/bundesliga/startseite/wettbewerb/L1"
     )
     page.raise_for_status()
     soup = BeautifulSoup(page.text, "html.parser")
 
-    team_links = soup.find_all(class_="vereinprofil_tooltip")
+    team_links = soup.find_all("a", href=True)
     teams = set()
     for link in team_links:
-        # Exclude Greece, because they are only listed, because of the previous winner nations.
-        if link.text and link.text != "Griechenland":
-            teams.add((link.text, link.attrs["id"]))
-    assert len(teams) == 24
+        href = link["href"]
+        if "/startseite/verein/" in href and "saison_id/2023" in href:
+            teams.add(href)
+    assert len(teams) == 18, teams
 
     # Parse the player data team wise.
     def parse_market_value(market_value_str) -> int:
@@ -58,19 +59,18 @@ def get_data_from_transfermarkt_de(session):
 
         market_value = float(market_value_list[0].replace(",", "."))
         if "Tsd." in market_value_list[1]:
-            market_value *= 10 ** 3
+            market_value *= 10**3
         elif "Mio." in market_value_list[1]:
-            market_value *= 10 ** 6
+            market_value *= 10**6
 
         return int(market_value)
 
     # TODO: dict with duplicated player name or plain list?
     data = []
-    for nation, nation_id in list(teams):
-        logging.debug(f"{nation=}")
-        page = session.get(
-            f"https://www.transfermarkt.de/deutschland/kader/verein/{nation_id}/saison_id/2020/plus/1"
-        )
+    for team_path in list(teams):
+        team_url = "https://www.transfermarkt.de" + team_path
+        logging.debug(f"{team_url=}")
+        page = session.get(team_url)
         page.raise_for_status()
         soup = BeautifulSoup(page.text, "html.parser")
 
@@ -79,13 +79,18 @@ def get_data_from_transfermarkt_de(session):
         )
 
         for player in players_row:
-            info = player.find_all(class_="spielprofil_tooltip")[0]
+            info = player.find_all(class_="hauptlink")[0]
             market_value = parse_market_value(player.find_all(class_="rechts")[0].text)
+            # "nationality" means "team" in this case, in order to refactor less.
             data.append(
-                common.Player(info.text, nation, info.attrs["id"], market_value)
+                {
+                    "name_": info.text.strip(),
+                    "market_value": market_value,
+                    "nationality": team_path.split("/")[1],
+                }
             )
     logging.debug("Transfermarkt data obtained.")
-    return data
+    return pd.DataFrame(data)
 
 
 @common.with_driver
@@ -95,7 +100,7 @@ def get_available_players_fantasy(driver):
         value_prefix = ingame_value_str[-1]
 
         if value_prefix == "M":
-            ingame_value *= 10 ** 6
+            ingame_value *= 10**6
         else:
             raise ValueError(f"Invalid prefix: {value_prefix}")
 
@@ -297,29 +302,47 @@ def main():
         action="store_true",
         help="Show players with the baes ratio (market value / ingame value).",
     )
-    parser.add_argument(
-        "--exclude-list",
-        default=None,
-        help="List of players to exclude. Separated by new line.",
-    )
     args = parser.parse_args()
 
-    available_players = get_data(
-        "work/available_players.dat", get_available_players_fantasy, args.force
-    )
     player_data_transfermarkt = get_data(
         "work/transfermarkt.dat", get_data_from_transfermarkt_de, args.force
     )
 
-    data = merge_player_data(available_players, player_data_transfermarkt)
-    if args.exclude_list is not None:
-        with open(args.exclude_list) as infile:
-            exclude_list = infile.read()
-        data = [d for d in data if d.name not in exclude_list]
-    if args.show_top_ratios:
-        print_top_ratios(data)  # Only for information.
+    player_data_kicker = pd.read_csv(
+        "https://classic.kicker-libero.de/api/sportsdata/v1/players-details/se-k00012023.csv",
+        delimiter=";",
+    )
+    player_data_kicker = player_data_kicker.rename(
+        columns={
+            "Angezeigter Name": "name_",
+            "Marktwert": "cost_ingame",
+            "Position": "position",
+        }
+    )
+    player_data_kicker["name_"] = player_data_kicker["name_"].str.lower()
+    # special cases
+    player_data_kicker["name_"] = player_data_kicker["name_"].apply(common.idfy)
+    player_data_kicker["name_"] = (
+        player_data_kicker["name_"]
+        .str.replace("dion drena beljo", "dion beljo", regex=False)
+        .str.replace("eric junior dina ebimbe", "junior dina ebimbe", regex=False)
+        .str.replace("jean-manuel mbom", "jean manuel mbom", regex=False)
+        .str.replace("kouadio kone", "manu kone", regex=False)
+        .str.replace("omar haktab traore", "omar traore", regex=False)
+        .str.replace("rafael santos borre", "rafael borre", regex=False)
+    )
+    player_data_transfermarkt["name_"] = player_data_transfermarkt["name_"].apply(
+        common.idfy
+    )
+    player_data_transfermarkt["name_"] = player_data_transfermarkt["name_"].str.replace(
+        "mateu morey bauzà", "mateu morey", regex=False
+    )
+    # use how="outer" for debugging
+    player_data = player_data_kicker.merge(
+        player_data_transfermarkt, on="name_", how="inner"
+    )
 
-    data_to_csv(data, "work/test.csv")
+    player_data.to_csv("work/test.csv")
 
 
 if __name__ == "__main__":
