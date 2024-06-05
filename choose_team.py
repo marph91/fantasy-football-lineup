@@ -11,14 +11,14 @@ from common import Position
 def create_model(dataframe):
     # Configuration
     expected_position_counts = {
-        Position.GOALKEEPER: 2,
-        Position.DEFENDER: 4,
-        Position.MIDFIELDER: 6,
-        Position.FORWARD: 3,
+        Position.GOALKEEPER: 3,
+        Position.DEFENDER: 8,
+        Position.MIDFIELDER: 9,
+        Position.FORWARD: 6,
     }
-    total_players = 15
-    players_per_nation = (0, 3)  # minimum 0, maximum 3
-    maximum_ingame_value = 30.0 * 10**6  # million
+    total_players = 26
+    players_per_nation = (0, 30)  # minimum 0, maximum 30 -> the limit got removed
+    maximum_ingame_value = 70.0 * 10**6  # million
 
     # Define the actual model.
     model = pyomo_env.ConcreteModel()
@@ -65,7 +65,8 @@ def create_model(dataframe):
     # Constraint: Amount of players for each position.
     def position_rule(model, position, expected_count):
         actual_count = sum(
-            model.chosen[i] * (model.position[i] == position.name) for i in model.name_
+            model.chosen[i] * int(model.position[i] == position.name)
+            for i in model.name_
         )
         return actual_count == expected_count
 
@@ -83,7 +84,7 @@ def create_model(dataframe):
     # Constraint: Amount of players of each national team.
     def nationality_rule(model, nation, count_min, count_max):
         actual_count = sum(
-            model.chosen[i] * (model.nationality[i] == nation) for i in model.name_
+            model.chosen[i] * int(model.nationality[i] == nation) for i in model.name_
         )
         return pyomo_env.inequality(count_min, actual_count, count_max)
 

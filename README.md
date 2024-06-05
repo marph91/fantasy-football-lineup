@@ -1,6 +1,12 @@
 # fantasy-football-lineup
 
-fantasy-football-lineup is a tool to find the optimal lineup for the [EURO 2020 Fantasy Football manager game](<https://gaming.uefa.com/de/uefaeuro2020fantasyfootball>).
+fantasy-football-lineup is a tool to find the optimal lineup for manager games.
+
+It was used for:
+
+- [EURO 2020 Fantasy Football manager game](https://gaming.uefa.com/de/uefaeuro2020fantasyfootball)
+- [Kicker Managerspiel Interactive Bundesliga 2023/24](https://www.kicker.de/managerspiel/interactive/se-k00012023)
+- [Kicker Managerspiel Interactive EM 2024](https://www.kicker.de/managerspiel/interactive/se-k01072024)
 
 ## Usage example
 

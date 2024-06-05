@@ -28,11 +28,9 @@ logging.basicConfig(
 
 
 @common.with_session
-def get_data_from_transfermarkt_de(session):
+def get_data_from_transfermarkt(session, url_all_teams, number_of_teams):
     # Parse all participants and their id.
-    page = session.get(
-        "https://www.transfermarkt.de/bundesliga/startseite/wettbewerb/L1"
-    )
+    page = session.get(url_all_teams)
     page.raise_for_status()
     soup = BeautifulSoup(page.text, "html.parser")
 
@@ -40,9 +38,9 @@ def get_data_from_transfermarkt_de(session):
     teams = set()
     for link in team_links:
         href = link["href"]
-        if "/startseite/verein/" in href and "saison_id/2023" in href:
+        if "/startseite/verein/" in href:
             teams.add(href)
-    assert len(teams) == 18, teams
+    assert len(teams) == number_of_teams, teams
 
     # Parse the player data team wise.
     def parse_market_value(market_value_str) -> int:
@@ -91,6 +89,18 @@ def get_data_from_transfermarkt_de(session):
             )
     logging.debug("Transfermarkt data obtained.")
     return pd.DataFrame(data)
+
+
+def get_data_from_transfermarkt_em_2024():
+    url_all_teams = "https://www.transfermarkt.de/europameisterschaft-2024/teilnehmer/pokalwettbewerb/EM24/saison_id/2023"
+    number_of_teams = 24
+    return get_data_from_transfermarkt(url_all_teams, number_of_teams)
+
+
+def get_data_from_transfermarkt_bundesliga_2023():
+    url_all_teams = "https://www.transfermarkt.de/bundesliga/startseite/wettbewerb/L1"
+    number_of_teams = 18
+    return get_data_from_transfermarkt(url_all_teams, number_of_teams)
 
 
 @common.with_driver
@@ -305,11 +315,11 @@ def main():
     args = parser.parse_args()
 
     player_data_transfermarkt = get_data(
-        "work/transfermarkt.dat", get_data_from_transfermarkt_de, args.force
+        "work/transfermarkt.dat", get_data_from_transfermarkt_em_2024, args.force
     )
 
     player_data_kicker = pd.read_csv(
-        "https://classic.kicker-libero.de/api/sportsdata/v1/players-details/se-k00012023.csv",
+        "https://classic.kicker-libero.de/api/sportsdata/v1/players-details/se-k01072024.csv",
         delimiter=";",
     )
     player_data_kicker = player_data_kicker.rename(
