@@ -108,8 +108,9 @@ def print_results(model):
                 (
                     Position[model.position[i]],
                     i,
+                    model.nationality[i],
                     model.cost_ingame[i] / 1000000.0,
-                    model.market_value[i],
+                    model.market_value[i] / 1000000.0,
                     f"{model.market_value[i] / model.cost_ingame[i]:.2f}",
                 )
             )
@@ -120,6 +121,7 @@ def print_results(model):
     table.field_names = [
         "Position",
         "Name",
+        "Club",
         "Ingame value [Mio. €]",
         "Market value [Mio. €]",
         "Ratio (market / ingame)",
@@ -130,6 +132,7 @@ def print_results(model):
         (
             "-",
             "Total",
+            "",
             total_ingame_sum / 1000000.0,
             total_market_value / 1000000.0,
             f"{total_market_value / total_ingame_sum:.2f}",
@@ -138,24 +141,35 @@ def print_results(model):
     print(table)
 
 
+def print_top_ratios(data):
+    print("Top Ratios:")
+    df_top_ratios = (
+        data[["name_", "nationality", "position", "cost_ingame", "market_value", "ratio"]]
+        .sort_values("ratio", ascending=False)
+        .head(20)
+    )
+    print(df_top_ratios)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--force", action="store_true", help="Force refreshing of the cache."
     )
     parser.add_argument(
-        "--show-top-ratios",
-        action="store_true",
-        help="Show players with the baes ratio (market value / ingame value).",
-    )
-    parser.add_argument(
         "--exclude-list",
         default=None,
         help="List of players to exclude. Separated by new line.",
     )
+    parser.add_argument(
+        "--show-top-ratios",
+        action="store_true",
+        help="Show players with the baes ratio (market value / ingame value).",
+    )
     args = parser.parse_args()
 
     dataframe = pd.read_csv("work/test.csv")
+    dataframe["ratio"] = dataframe["market_value"] / dataframe["cost_ingame"]
 
     if args.exclude_list is not None:
         with open(args.exclude_list) as infile:
@@ -168,6 +182,9 @@ def main():
     opt.solve(model)
 
     print_results(model)
+
+    if args.show_top_ratios:
+        print_top_ratios(dataframe)  # Only for information.
 
 
 if __name__ == "__main__":

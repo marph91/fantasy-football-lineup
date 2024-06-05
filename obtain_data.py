@@ -286,31 +286,10 @@ def get_data(filename, obtain_function, force):
     return data
 
 
-def print_top_ratios(data):
-    ratios = []
-    for player in data:
-        ratios.append(
-            (
-                player.market_value / player.ingame_value,
-                player.market_value,
-                player.ingame_value,
-                player.ingame_position,
-                player.name,
-            )
-        )
-    for ratio in list(reversed(sorted(ratios)))[:20]:
-        print(*ratio)
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--force", action="store_true", help="Force refreshing of the cache."
-    )
-    parser.add_argument(
-        "--show-top-ratios",
-        action="store_true",
-        help="Show players with the baes ratio (market value / ingame value).",
     )
     args = parser.parse_args()
 
@@ -352,7 +331,7 @@ def main():
         player_data_transfermarkt, on="name_", how="inner"
     )
 
-    player_data.to_csv("work/test.csv")
+    player_data.to_csv("work/test.csv", index=False)
 
 
 if __name__ == "__main__":
