@@ -70,13 +70,17 @@ class Player:
         return Player(
             self.name,
             self.nationality if self.nationality is not None else other.nationality,
-            self.id_transfermarkt_de
-            if self.id_transfermarkt_de is not None
-            else other.id_transfermarkt_de,
+            (
+                self.id_transfermarkt_de
+                if self.id_transfermarkt_de is not None
+                else other.id_transfermarkt_de
+            ),
             self.market_value if self.market_value is not None else other.market_value,
-            self.ingame_position
-            if self.ingame_position is not None
-            else other.ingame_position,
+            (
+                self.ingame_position
+                if self.ingame_position is not None
+                else other.ingame_position
+            ),
             self.ingame_value if self.ingame_value is not None else other.ingame_value,
         )
 
