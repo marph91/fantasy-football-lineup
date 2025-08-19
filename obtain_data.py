@@ -2,6 +2,7 @@ import argparse
 import logging
 import os
 import pickle
+import time
 
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -68,7 +69,13 @@ def get_data_from_transfermarkt(session, url_all_teams, number_of_teams):
     for team_path in list(teams):
         team_url = "https://www.transfermarkt.de" + team_path
         logging.debug(f"{team_url=}")
-        page = session.get(team_url)
+        for wait in range(5):
+            page = session.get(team_url)
+            if 200 <= page.status_code < 300:
+                break
+            # try once again if it's a server issue
+            logging.debug(f"{page.status_code=}. Trying again.")
+            time.sleep(wait)
         page.raise_for_status()
         soup = BeautifulSoup(page.text, "html.parser")
 
