@@ -4,6 +4,7 @@ fantasy-football-lineup is a tool to find the optimal lineup for manager games.
 
 It was used for:
 
+- [Kicker Managerspiel Interactive Bundesliga 2025/26](https://www.kicker.de/managerspiel/interactive/se-k00012025)
 - [EURO 2020 Fantasy Football manager game](https://gaming.uefa.com/de/uefaeuro2020fantasyfootball)
 - [Kicker Managerspiel Interactive Bundesliga 2023/24](https://www.kicker.de/managerspiel/interactive/se-k00012023)
 - [Kicker Managerspiel Interactive EM 2024](https://www.kicker.de/managerspiel/interactive/se-k01072024)
@@ -14,26 +15,33 @@ It was used for:
 > pip install -r requirements.txt
 > python obtain_data.py
 > python choose_team.py
-+---------------------+------------------------+-----------------------+-----------------------+-------------------------+
-|       Position      |          Name          | Ingame value [Mio. €] | Market value [Mio. €] | Ratio (market / ingame) |
-+---------------------+------------------------+-----------------------+-----------------------+-------------------------+
-| Position.GOALKEEPER |  Gianluigi Donnarumma  |          5.5          |          60.0         |          10.91          |
-| Position.GOALKEEPER |    Thibaut Courtois    |          6.0          |          60.0         |          10.00          |
-|   Position.DEFENSE  |   Alessandro Bastoni   |          4.5          |          60.0         |          13.33          |
-|   Position.DEFENSE  |    Andrew Robertson    |          5.5          |          65.0         |          11.82          |
-|   Position.DEFENSE  |    Matthijs de Ligt    |          5.5          |          75.0         |          13.64          |
-|   Position.DEFENSE  |     Raphaël Varane     |          6.0          |          70.0         |          11.67          |
-|   Position.DEFENSE  | Trent Alexander-Arnold |          6.5          |          75.0         |          11.54          |
-|  Position.MIDFIELD  |    Frenkie de Jong     |          7.0          |          90.0         |          12.86          |
-|  Position.MIDFIELD  |     Joshua Kimmich     |          6.0          |          90.0         |          15.00          |
-|  Position.MIDFIELD  |     Leon Goretzka      |          6.5          |          70.0         |          10.77          |
-|  Position.MIDFIELD  |    Marcos Llorente     |          5.0          |          70.0         |          14.00          |
-|  Position.MIDFIELD  |         Rodri          |          5.0          |          70.0         |          14.00          |
-|   Position.OFFENSE  |       Harry Kane       |          11.5         |         120.0         |          10.43          |
-|   Position.OFFENSE  |     Kylian Mbappé      |          12.0         |         160.0         |          13.33          |
-|   Position.OFFENSE  |    Mikel Oyarzabal     |          7.5          |          70.0         |           9.33          |
-|          -          |         Total          |         100.0         |         1205.0        |          12.05          |
-+---------------------+------------------------+-----------------------+-----------------------+-------------------------+
++---------------------+-----------------------------+--------------------------+-----------------------+-----------------------+-------------------------+
+|       Position      |             Name            |           Club           | Ingame value [Mio. €] | Market value [Mio. €] | Ratio (market / ingame) |
++---------------------+-----------------------------+--------------------------+-----------------------+-----------------------+-------------------------+
+| Position.GOALKEEPER |       leopold zingerle      |  rasenballsport-leipzig  |          0.5          |          0.4          |           0.80          |
+| Position.GOALKEEPER |        patrick drewes       |    borussia-dortmund     |          0.5          |          0.5          |           1.00          |
+| Position.GOALKEEPER |         sven ulreich        |    fc-bayern-munchen     |          0.5          |          0.5          |           1.00          |
+|  Position.DEFENDER  |       alphonso davies       |    fc-bayern-munchen     |          3.2          |          50.0         |          15.62          |
+|  Position.DEFENDER  |       castello lukeba       |  rasenballsport-leipzig  |          2.8          |          40.0         |          14.29          |
+|  Position.DEFENDER  |       dayot upamecano       |    fc-bayern-munchen     |          3.6          |          50.0         |          13.89          |
+|  Position.DEFENDER  |       jeanuel belocian      |   bayer-04-leverkusen    |          1.4          |          15.0         |          10.71          |
+|  Position.DEFENDER  |         min-jae kim         |    fc-bayern-munchen     |          3.2          |          40.0         |          12.50          |
+|  Position.DEFENDER  |        piero hincapie       |   bayer-04-leverkusen    |          3.8          |          50.0         |          13.16          |
+|  Position.DEFENDER  |          sacha boey         |    fc-bayern-munchen     |          1.5          |          18.0         |          12.00          |
+| Position.MIDFIELDER |     aleksandar pavlovic     |    fc-bayern-munchen     |          3.6          |          55.0         |          15.28          |
+| Position.MIDFIELDER | alexander roessing-lelesiit |       hamburger-sv       |          0.6          |          2.0          |           3.33          |
+| Position.MIDFIELDER |       arthur vermeeren      |  rasenballsport-leipzig  |          2.0          |          22.0         |          11.00          |
+| Position.MIDFIELDER |         hugo larsson        |   eintracht-frankfurt    |          3.0          |          40.0         |          13.33          |
+| Position.MIDFIELDER |        jamal musiala        |    fc-bayern-munchen     |          6.0          |         140.0         |          23.33          |
+| Position.MIDFIELDER |        mirza catovic        |      vfb-stuttgart       |          0.5          |          0.8          |           1.60          |
+| Position.MIDFIELDER |         noah fenyoe         |   eintracht-frankfurt    |          0.5          |          0.35         |           0.70          |
+|   Position.FORWARD  |         alejo sarco         |   bayer-04-leverkusen    |          0.5          |          0.8          |           1.60          |
+|   Position.FORWARD  |         david mokwa         |   tsg-1899-hoffenheim    |          0.5          |          1.0          |           2.00          |
+|   Position.FORWARD  |       grant-leon ranos      | borussia-monchengladbach |          0.5          |          0.5          |           1.00          |
+|   Position.FORWARD  |       jonah kusi-asare      |    fc-bayern-munchen     |          0.5          |          2.5          |           5.00          |
+|   Position.FORWARD  |        karim adeyemi        |    borussia-dortmund     |          3.3          |          45.0         |          13.64          |
+|          -          |            Total            |                          |          42.5         |         574.35        |          13.51          |
++---------------------+-----------------------------+--------------------------+-----------------------+-----------------------+-------------------------+
 ```
 
 This example team is not based on the latest data. To get the best team, you should try yourself ;)
@@ -48,7 +56,7 @@ For extended usage, check the help of `obtain_data.py`. There are some useful fl
 | Parse market values from <https://www.transfermarkt.de> | [Beautifulsoup](https://www.crummy.com/software/BeautifulSoup/) |
 | Match available players and their market values via player names | |
 | Cache the data | Pickle (intermediate data), csv (completed player list) |
-| Find 15 players with the highest market value, who still fit in the budget and in the formation | [Pyomo](https://www.pyomo.org/), [Pandas](https://pandas.pydata.org/) |
+| Find players with the highest market value, who still fit in the budget and in the formation | [Pyomo](https://www.pyomo.org/), [Pandas](https://pandas.pydata.org/) |
 | Print the chosen players | [Prettytable](https://github.com/jazzband/prettytable) |
 
 ## Potential improvements

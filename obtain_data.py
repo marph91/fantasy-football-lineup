@@ -39,9 +39,9 @@ def get_data_from_transfermarkt(session, url_all_teams, number_of_teams):
     teams = set()
     for link in team_links:
         href = link["href"]
-        if "/startseite/verein/" in href:
+        if "/startseite/verein/" in href and "saison_id" in href:
             teams.add(href)
-    assert len(teams) == number_of_teams, teams
+    assert len(teams) == number_of_teams, f"{len(teams)=}, {number_of_teams=}, {teams}"
 
     # Parse the player data team wise.
     def parse_market_value(market_value_str) -> int:
@@ -104,7 +104,7 @@ def get_data_from_transfermarkt_em_2024():
     return get_data_from_transfermarkt(url_all_teams, number_of_teams)
 
 
-def get_data_from_transfermarkt_bundesliga_2023():
+def get_data_from_transfermarkt_bundesliga():
     url_all_teams = "https://www.transfermarkt.de/bundesliga/startseite/wettbewerb/L1"
     number_of_teams = 18
     return get_data_from_transfermarkt(url_all_teams, number_of_teams)
@@ -301,11 +301,11 @@ def main():
     args = parser.parse_args()
 
     player_data_transfermarkt = get_data(
-        "work/transfermarkt.dat", get_data_from_transfermarkt_em_2024, args.force
+        "work/transfermarkt.dat", get_data_from_transfermarkt_bundesliga, args.force
     )
 
     player_data_kicker = pd.read_csv(
-        "https://classic.kicker-libero.de/api/sportsdata/v1/players-details/se-k01072024.csv",
+        "https://www.kicker-libero.de/api/sportsdata/v1/players-details/se-k00012025.csv",
         delimiter=";",
     )
     player_data_kicker = player_data_kicker.rename(
@@ -318,20 +318,8 @@ def main():
     player_data_kicker["name_"] = player_data_kicker["name_"].str.lower()
     # special cases
     player_data_kicker["name_"] = player_data_kicker["name_"].apply(common.idfy)
-    player_data_kicker["name_"] = (
-        player_data_kicker["name_"]
-        .str.replace("dion drena beljo", "dion beljo", regex=False)
-        .str.replace("eric junior dina ebimbe", "junior dina ebimbe", regex=False)
-        .str.replace("jean-manuel mbom", "jean manuel mbom", regex=False)
-        .str.replace("kouadio kone", "manu kone", regex=False)
-        .str.replace("omar haktab traore", "omar traore", regex=False)
-        .str.replace("rafael santos borre", "rafael borre", regex=False)
-    )
     player_data_transfermarkt["name_"] = player_data_transfermarkt["name_"].apply(
         common.idfy
-    )
-    player_data_transfermarkt["name_"] = player_data_transfermarkt["name_"].str.replace(
-        "mateu morey bauzà", "mateu morey", regex=False
     )
     # use how="outer" for debugging
     player_data = player_data_kicker.merge(

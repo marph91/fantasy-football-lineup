@@ -12,13 +12,13 @@ def create_model(dataframe):
     # Configuration
     expected_position_counts = {
         Position.GOALKEEPER: 3,
-        Position.DEFENDER: 8,
-        Position.MIDFIELDER: 9,
-        Position.FORWARD: 6,
+        Position.DEFENDER: 7,
+        Position.MIDFIELDER: 7,
+        Position.FORWARD: 5,
     }
-    total_players = 26
+    total_players = 22
     players_per_nation = (0, 30)  # minimum 0, maximum 30 -> the limit got removed
-    maximum_ingame_value = 70.0 * 10**6  # million
+    maximum_ingame_value = 42.5 * 10**6  # million
 
     # Define the actual model.
     model = pyomo_env.ConcreteModel()
