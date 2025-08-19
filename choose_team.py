@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 
 import pandas as pd
 import pyomo.environ as pyomo_env
@@ -159,6 +160,7 @@ def main():
     parser.add_argument(
         "--exclude-list",
         default=None,
+        type=Path,
         help="List of players to exclude. Separated by new line.",
     )
     parser.add_argument(
@@ -172,8 +174,7 @@ def main():
     dataframe["ratio"] = dataframe["market_value"] / dataframe["cost_ingame"]
 
     if args.exclude_list is not None:
-        with open(args.exclude_list) as infile:
-            exclude_list = infile.readlines()
+        exclude_list = args.exclude_list.read_text().split("\n")
         dataframe = dataframe[~dataframe["name_"].isin(exclude_list)]
 
     model = create_model(dataframe)
