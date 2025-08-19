@@ -50,7 +50,7 @@ def get_data_from_transfermarkt(session, url_all_teams, number_of_teams):
             logging.warning(f"Invalid market value: {market_value_str}")
             return 0
 
-        if not "€" in market_value_list[2]:
+        if "€" not in market_value_list[2]:
             logging.warning(
                 f"Invalid currency: {market_value_list[2]}. Only euro supported."
             )
